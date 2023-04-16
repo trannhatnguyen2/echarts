@@ -1,0 +1,13 @@
+.container {
+  height: 100vh;
+}
+
+.demo-chart {
+  height: 100vh;
+}
+
+button {
+  padding: 10px;
+  background-color: aqua;
+  border-radius: 5px;
+}

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { EChartsOption } from 'echarts';
 
 @Component({
@@ -7,38 +8,69 @@ import { EChartsOption } from 'echarts';
   styleUrls: ['./charts.component.css'],
 })
 export class ChartsComponent implements OnInit {
-  constructor() {}
+  url: string = './assets/data/les-miserables.json';
+  graph: any;
+  option: any;
+  chartOption!: EChartsOption;
+  errMessage: string = '';
+
+  constructor(private _http: HttpClient) {
+    // _http.get(this.url).subscribe((res) => {
+    //   this.graph = res;
+    //   console.log('lấy được data');
+    // });
+    console.log('hello');
+    this._http.get<any>(this.url).subscribe({
+      next: (data) => {
+        this.graph = data;
+        console.log('lấy được data');
+      },
+      error: (err) => {
+        this.errMessage = err;
+        console.log('chưa lấy được data');
+      },
+    });
+  }
 
   ngOnInit(): void {}
 
-  chartOption: EChartsOption = {
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
+  chart() {
+    this.chartOption = {
+      tooltip: {},
+      legend: [
+        {
+          data: this.graph.categories.map(function (a: { name: string }) {
+            return a.name;
+          }),
+        },
       ],
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        data: [820, 932, 901, 934, 1290, 1430, 1550, 1200, 1650.145, 1680.189],
-        type: 'line',
-        areaStyle: {},
-      },
-    ],
-  };
+      series: [
+        {
+          name: 'Les Miserables',
+          type: 'graph',
+          layout: 'none',
+          data: this.graph.nodes,
+          links: this.graph.links,
+          categories: this.graph.categories,
+          roam: true,
+          label: {
+            show: true,
+            position: 'right',
+            formatter: '{b}',
+          },
+          labelLayout: {
+            hideOverlap: true,
+          },
+          scaleLimit: {
+            min: 0.4,
+            max: 2,
+          },
+          lineStyle: {
+            color: 'source',
+            curveness: 0.3,
+          },
+        },
+      ],
+    };
+  }
 }
